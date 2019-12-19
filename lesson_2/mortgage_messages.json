@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome to the Mortgage/Car Loan calculator!",
+  "loanAmountPrompt": "Please enter the loan amount (No decimals, whole numbers only):",
+  "invalidLoanAmountPrompt": "That is not a valid number. Please enter a valid loan amount: ",
+  "aprPrompt": "Please enter the Annual Percentage rate \n=> Format: %0.00 (up to 4 decimal places)",
+  "loanDurationPrompt": "Please enter the loan duration between 1 & 70 years): ",
+  "aprInvalidPrompt": "That is not a valid APR. Please follow the correct format. \n=> %0.00 (up to 4 decimal places)",
+  "loanDurationInvalidPrompt": "That is not a valid loan duration. \n=> Please enter a number between 1 and 70.",
+  "goAgain": "Would you like to perform another calculation? \n=> Input 'y' or 'Y' for yes and anything else for no."
+}
