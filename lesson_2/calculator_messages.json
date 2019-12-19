@@ -1,0 +1,22 @@
+{
+  "language": "Please choose a language: 'it' for Italian, 'en' for English.",
+  "invalidLanguage": "Sorry that is not a valid language. Try again.",
+  "en": {
+    "welcome": "Welcome to Calculator!",
+    "firstNumberPrompt": "What's the first number?",
+    "invalidNumber": "Hmm... that doesn't look like a valid number. Try again.",
+    "secondNumberPrompt": "What's the second number?",
+    "operationPrompt": "What operation would you like to perform? \n 1) Add\n 2) Subtract\n 3) Multiply\n 4) Divide",
+    "invalidOperation": "Must choose 1, 2, 3 or 4",
+    "continuePrompt": "Would you like to perform another calculation?\n Please type 'Y' or 'y' for Yes. Any other input will be treated as no."
+  },
+  "it": {
+    "welcome": "Benvenuto in Calcolatrice!",
+    "firstNumberPrompt": "Qual è il primo numero?",
+    "invalidNumber": "Hmm ... quello non sembra un numero valido. Riprova.",
+    "secondNumberPrompt": "Qual è il secondo numero?",
+    "operationPrompt": "Quale operazione ti piacerebbe eseguire? \n 1) Aggiungi \n 2) Sottrai \n 3) Moltiplica \n 4) Dividi",
+    "invalidOperation": "Devi scegliere 1, 2, 3 o 4",
+    "continuePrompt": "Desideri eseguire un altro calcolo? \n Digitare 'Y' o 'y' per Sì. Qualsiasi altro input verrà trattato come no."
+  }
+}
