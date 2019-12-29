@@ -1,10 +1,12 @@
 {
   "welcome": "Welcome to the Mortgage/Car Loan calculator!",
+  "spacer": "--------------------------------------------",
   "loanAmountPrompt": "Please enter the loan amount:",
   "invalidLoanAmountPrompt": "That is not a valid loan amount. Please enter a valid loan amount: ",
-  "aprPrompt": "Please enter the Annual Percentage rate \n=> Please enter with either x.xx or %x.xx format.",
+  "aprPrompt": "Please enter the Annual Percentage rate \n=> Either x.xx or %x.xx format.",
   "loanDurationPrompt": "Please enter the loan duration in years: ",
   "aprInvalidPrompt": "That is not a valid APR. Please enter with either x.xx or %x.xx format.",
   "loanDurationInvalidPrompt": "That is not a valid loan duration. \n=> Please enter a number.",
-  "goAgain": "Would you like to perform another calculation? \n=> Input 'y' or 'Y' for yes and anything else for no."
+  "goAgain": "Would you like to perform another calculation? \n=> Input 'yes' or 'no'.",
+  "invalidRepeatAction": "Invalid input option. \n=> Input 'yes' or 'no'."
 }

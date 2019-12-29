@@ -15,10 +15,6 @@ function isPositive(number) {
   return Math.sign(number) === 1 || Math.sign(number) === 0;
 }
 
-// function isValidNumber(number) {
-//   return Number.isInteger(Number(number));
-// }
-
 function isValidLoanAmount(number) {
   return isValidFloat(number) && isPositive(number) && isNotEmpty(number);
 }
@@ -40,20 +36,26 @@ function isValidLoanDuration(number) {
 }
 
 function goAgain(input) {
-  return input === 'y' || input === 'Y';
+  return input.toLowerCase() === 'yes';
+}
+
+function endProgram(input) {
+  return input.toLowerCase() === 'no';
 }
 
 function adjustAprFormat(number) {
     return number.slice(1);
 }
-
+prompt(MESSAGE['spacer']);
 prompt(MESSAGE['welcome']);
 
-do {
+while (true) {
+    prompt(MESSAGE['spacer']);
   prompt(MESSAGE['loanAmountPrompt']);
+
   let loanAmount = readSync.question();
 
-  while (!isValidLoanAmount(loanAmount)) {
+  while (!isValidLoanAmount(loanAmount) || loanAmount < 1) {
     prompt(MESSAGE['invalidLoanAmountPrompt']);
     loanAmount = readSync.question();
   }
@@ -65,6 +67,8 @@ do {
     annualPercentageRate = adjustAprFormat(annualPercentageRate);
   }
 
+  // console.log(!isValidApr(annualPercentageRate));
+
   while (!isValidApr(annualPercentageRate)) {
     prompt(MESSAGE['aprInvalidPrompt']);
     annualPercentageRate = readSync.question();
@@ -75,6 +79,8 @@ do {
 
   prompt(MESSAGE['loanDurationPrompt']);
   let loanDuration = readSync.question();
+
+  console.log(!isValidLoanDuration(loanDuration));
 
   while (!isValidLoanDuration(loanDuration)) {
     prompt(MESSAGE['loanDurationInvalidPrompt']);
@@ -91,5 +97,12 @@ do {
 
   prompt(`Your monthly payment is: $${monthlyPayment.toFixed(2)}\n`);
   prompt(MESSAGE['goAgain']);
+  let userInput = readSync.question().toLowerCase();
 
-} while (goAgain(readSync.question()));
+  while (userInput !== 'yes' && userInput !== 'no') {
+    prompt(MESSAGE['invalidRepeatAction']);
+    userInput = readSync.question().toLowerCase();
+  }
+
+  if (userInput === 'no') break;
+}
