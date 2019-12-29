@@ -35,22 +35,15 @@ function isValidLoanDuration(number) {
   return number > 0 && isValidFloat(number);
 }
 
-function goAgain(input) {
-  return input.toLowerCase() === 'yes';
-}
-
-function endProgram(input) {
-  return input.toLowerCase() === 'no';
-}
-
 function adjustAprFormat(number) {
-    return number.slice(1);
+  return number.slice(1);
 }
+
 prompt(MESSAGE['spacer']);
 prompt(MESSAGE['welcome']);
 
 while (true) {
-    prompt(MESSAGE['spacer']);
+  prompt(MESSAGE['spacer']);
   prompt(MESSAGE['loanAmountPrompt']);
 
   let loanAmount = readSync.question();
