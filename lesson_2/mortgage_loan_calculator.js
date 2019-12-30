@@ -1,7 +1,7 @@
 const readSync = require('readline-sync');
 const MESSAGE = require('./mortgage_messages.json');
 
-let decFormat = /^([0-9]{1,}){1}(\.[0-9]{1,})?$/g;
+let decFormat = /^([0-9]{1,}){1}(\.[0-9]{1,})?$/;
 
 function prompt(message) {
   console.log(`=> ${message}`);
@@ -60,8 +60,6 @@ while (true) {
     annualPercentageRate = adjustAprFormat(annualPercentageRate);
   }
 
-  // console.log(!isValidApr(annualPercentageRate));
-
   while (!isValidApr(annualPercentageRate)) {
     prompt(MESSAGE['aprInvalidPrompt']);
     annualPercentageRate = readSync.question();
@@ -73,8 +71,6 @@ while (true) {
   prompt(MESSAGE['loanDurationPrompt']);
   let loanDuration = readSync.question();
 
-  console.log(!isValidLoanDuration(loanDuration));
-
   while (!isValidLoanDuration(loanDuration)) {
     prompt(MESSAGE['loanDurationInvalidPrompt']);
     loanDuration = readSync.question();
@@ -83,10 +79,16 @@ while (true) {
   let annualInterestRate = Number(annualPercentageRate) / 100;
   let monthlyInterestRate = annualInterestRate / 12;
   let months = Number(loanDuration) * 12;
-  let monthlyPayment = Number(loanAmount) *
-                    (monthlyInterestRate /
-                    (1 - Math.pow((1 +
-                    monthlyInterestRate), (-Number(months)))));
+  let monthlyPayment = 0;
+  console.log(annualPercentageRate !== '0');
+  if (annualPercentageRate !== '0') {
+    monthlyPayment = Number(loanAmount) *
+                     (monthlyInterestRate /
+                     (1 - Math.pow((1 +
+                     monthlyInterestRate), (-Number(months)))));
+  } else {
+    monthlyPayment = Number(loanAmount) / months;
+  }
 
   prompt(`Your monthly payment is: $${monthlyPayment.toFixed(2)}\n`);
   prompt(MESSAGE['goAgain']);
