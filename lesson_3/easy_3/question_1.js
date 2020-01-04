@@ -1,0 +1,27 @@
+let numbers = [1, 2, 3, 4];
+
+while (numbers.length > 0) {
+  numbers.pop();
+}
+
+console.log(numbers);
+
+numbers = [1, 2, 3, 4];
+
+while (numbers.length > 0) {
+  numbers.shift();
+}
+
+console.log(numbers);
+
+numbers = [1, 2, 3, 4];
+
+numbers.splice(0);
+
+console.log(numbers);
+
+numbers = [1, 2, 3, 4];
+
+numbers = numbers.slice(0, 0);
+
+console.log(numbers);
