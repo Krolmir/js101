@@ -27,10 +27,4 @@ arr.sort(function(a, b) {
    return addOddNumbers(a) - addOddNumbers(b);
 });
 
-// for (let index = 0; index < arr.length; index++) {
-//   arr.sort(function(a, b) {
-//     a - b;
-//   });
-// }
-
 console.log(arr);
