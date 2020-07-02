@@ -1,46 +1,23 @@
-// Tic Tac Toe
-// display a board using a function
-
 const readSync = require('readline-sync');
 const COMP_MARK = 'O';
 const PLAYER_MARK = 'X';
-const INITIAL_MARK = " ";
-let boardObject = { 1: INITIAL_MARK,
-                    2: INITIAL_MARK,
-                    3: INITIAL_MARK,
-                    4: INITIAL_MARK,
-                    5: INITIAL_MARK,
-                    6: INITIAL_MARK,
-                    7: INITIAL_MARK,
-                    8: INITIAL_MARK,
-                    9: INITIAL_MARK,
-}
+const INITIAL_MARK = ' ';
+const GAME_TOTAL = 5;
+const HIGHRISKSQUARES = {
+  1: [[2, 3], [4, 7], [5, 9]],
+  2: [[1, 3], [5, 8]],
+  3: [[1, 2], [5, 7], [6, 9]],
+  4: [[1, 7], [5, 6]],
+  5: [[1, 9], [2, 8], [3, 7], [4, 6]],
+  6: [[3, 9], [4, 5]],
+  7: [[1, 4], [8, 9], [3, 5]],
+  8: [[2, 5], [7, 9]],
+  9: [[1, 5], [7, 8], [3, 6]]
+};
 let remainingSpots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-function checkHorizontal(mark, board) {
-  return (board[1] === mark && board[2] === mark && board[3] === mark ||
-          board[4] === mark && board[5] === mark && board[6] === mark ||
-          board[7] === mark && board[8] === mark && board[9] === mark);
-}
-
-function checkVertical(mark, board) {
-  return (board[1] === mark && board[4] === mark && board[7] === mark ||
-          board[2] === mark && board[5] === mark && board[8] === mark ||
-          board[3] === mark && board[6] === mark && board[9] === mark);
-}
-
-function checkDiaganal(mark, board) {
-  return (board[1] === mark && board[5] === mark && board[9] === mark ||
-          board[3] === mark && board[5] === mark && board[7] === mark);
-}
-
-function checkWinner(mark, board) {
-  if (checkHorizontal(mark, board) ||
-      checkVertical(mark, board) ||
-      checkDiaganal(mark, board)){
-    console.log('We have a winner');
-  }
-}
+let indexToDelete = '';
+let firstToAct, alternate, currentPlayer;
+let scoreBoard = initializeScoreBoard();
 
 function emptyLine() {
   console.log(' ');
@@ -54,8 +31,22 @@ function prompt(msg = "") {
   console.log("=> " + msg);
 }
 
-function displayRemainingOptions() {
-  console.log("Remaining Options: " + remainingSpots.join(', '));
+function spacerSmall() {
+  console.log("----------------------------");
+}
+
+function spacerMedium() {
+  console.log("----------------------------------------------------");
+}
+
+function spacerLarge() {
+  console.log("--------------------------------------------------------------");
+}
+
+function displayScoreBoard(scoreBoard) {
+  console.log("Player Wins: " + scoreBoard[0]);
+  console.log("Computer Wins: " + scoreBoard[1]);
+  console.log("Ties: " + scoreBoard[2]);
 }
 
 function displayBoard(board) {
@@ -73,12 +64,54 @@ function displayBoard(board) {
   spacerMedium();
 }
 
-function populateDisplayOptions(value, num) {
-  if (value === INITIAL_MARK) {
-    return num
-  } else {
-    return ' ';
+function displayEnterToContinue() {
+  readSync.question(prompt("Press Enter to continue..."));
+  console.clear();
+}
+
+function displayGrandWinner() {
+  if (playerGrandWinner(scoreBoard)) {
+    displayGrandWinnerPlayer();
+   } else {
+    displayGrandWinnerComputer();
   }
+}
+
+function displayGrandWinnerComputer() {
+  spacerLarge();
+  console.log("Sorry but the computer has bested you in the race to " +
+              GAME_TOTAL + " wins. They are the Grand Winner.");
+  spacerLarge();
+  displayPlayAgain();
+  spacerLarge();
+}
+
+function displayGrandWinnerPlayer() {
+  spacerLarge();
+  console.log("Cogragualtions you are the Grand Winner in the race to " +
+               GAME_TOTAL + " wins!!!");
+  spacerLarge();
+  displayPlayAgain();
+  spacerLarge();
+}
+
+function displayInvalidInput(boardObject) {
+  console.clear();
+  displayScoreBoard(scoreBoard);
+  displayBoard(boardObject);
+  console.log("Invalid Input. Please select one of the available options below:");
+  displayRemainingOptions();
+  displayOptions(boardObject);
+}
+
+function displayInvalidWhoGoesFirst() {
+  console.log("That is not a valid choice.");
+  prompt("Please enter 'F' or 'f' for first and 'S' or 's' for second:");
+}
+
+function displayInvalidYN() {
+  console.log("That is not a valid choice.");
+  displayYesNoPrompt();
 }
 
 function displayOptions(board) {
@@ -101,89 +134,362 @@ function displayOptions(board) {
               populateDisplayOptions(board[8], 8) + ' | ' +
               populateDisplayOptions(board[9], 9));
   console.log('                  |   |   ');
-
 }
 
-function spacerSmall() {
-  console.log("----------------------------");
+function displayPlayAgain() {
+  prompt("Would you like to play again?");
+  displayYesNoPrompt();
 }
 
-function spacerMedium() {
-  console.log("----------------------------------------------------");
+function displayRules() {
+  prompt("Rules are as follows:");
+  console.log("  1. TicTacToe is a 2 player game with Player1 being 'X' and " +
+              "Player2 also known as the Computer being 'O'.");
+  console.log("  2. Each player takes turns marking spaces in a 3x3 grid.");
+  console.log("  3. The player who succeeds in placing three of their marks" +
+              " in a horizontal, vertical, or diagonal row is the winner.");
+  console.log(`  4. In our version of the game it is first to ${GAME_TOTAL} ` +
+              `wins to claim GrandWinner!.`);
 }
 
-function spacerLarge() {
-  console.log("--------------------------------------------------------------");
+function displayAlternateMessage() {
+  prompt("Would you like to alternate who goes first after every game?");
+  displayYesNoPrompt();
 }
 
-function displayWelcomeMessage() {
-  console.clear();
-  spacerSmall();
-  prompt("Welcome to Tic Tac Toe!!")
-  spacerSmall();
-  prompt("Rules are as follows:")
-  console.log("    - 2 player game with Yourself being 'X' and Computer " +
-              "being'O'");
-  console.log("    - Each player takes turns marking spaces in a 3x3 grid");
-  console.log("    - The player who succeeds in placing three of their marks "+
-              "in a horizontal, vertical, or diagonal row is the winner");
-  spacerLarge();
-  readSync.question(prompt("Press Enter to continue..."));
-  console.clear();
-}
-
-function displayUserTurnMessage() {
+function displayUserTurn(boardObject) {
+  displayBoard(boardObject);
   prompt("Please input a number based on the remaining squares below:");
   displayRemainingOptions();
   displayOptions(boardObject);
 }
 
-displayWelcomeMessage();
-displayBoard(boardObject);
+function displayRemainingOptions() {
+  if (remainingSpots.length === 1) {
+    console.log("Remaining Options: " + remainingSpots);
+  } else {
+    console.log("Remaining Options: " + joinOr(remainingSpots, ', ', 'or'));
+  }
+}
 
-//Main Loop
+function displayTie(boardObject) {
+  displayBoard(boardObject);
+  console.log("It's a tie.");
+  displayEnterToContinue();
+}
 
-while (true){
-  displayUserTurnMessage();
+function displayWinner(user, boardObject) {
+  if (user === PLAYER_MARK) {
+    displayBoard(boardObject);
+    console.log('You have Won!');
+    displayEnterToContinue();
+  } else if (user === COMP_MARK) {
+    displayBoard(boardObject);
+    console.log('The Computer has won!');
+    displayEnterToContinue();
+  }
+}
 
+function displayWelcomeMessage() {
+  console.clear();
+  spacerSmall();
+  prompt("Welcome to Tic Tac Toe!!");
+  spacerSmall();
+  displayRules();
+  spacerLarge();
+  displayEnterToContinue();
+}
+
+function displayWhoGoesFirstMessage() {
+  prompt("Would you like to be the first to choose your square or second?");
+  prompt("Please enter 'F' or 'f' for first and 'S' or 's' for second:");
+}
+
+function displayYesNoPrompt() {
+  prompt("Please enter 'Y' or 'y' for Yes and 'N' or 'n' for No:");
+}
+
+function boardFull() {
+  return (remainingSpots.length < 1);
+}
+
+function checkHorizontal(mark, board) {
+  return ((board[1] === mark && board[2] === mark && board[3] === mark) ||
+          (board[4] === mark && board[5] === mark && board[6] === mark) ||
+          (board[7] === mark && board[8] === mark && board[9] === mark));
+}
+
+function checkVertical(mark, board) {
+  return ((board[1] === mark && board[4] === mark && board[7] === mark) ||
+          (board[2] === mark && board[5] === mark && board[8] === mark) ||
+          (board[3] === mark && board[6] === mark && board[9] === mark));
+}
+
+function checkDiaganal(mark, board) {
+  return ((board[1] === mark && board[5] === mark && board[9] === mark) ||
+          (board[3] === mark && board[5] === mark && board[7] === mark));
+}
+
+function checkWinner(mark, board) {
+  return (checkHorizontal(mark, board) || checkVertical(mark, board) ||
+          checkDiaganal(mark, board));
+}
+
+function chooseSquare(board) {
+  if (currentPlayer === 'Player') {
+    playerTurn(board);
+    currentPlayer = 'Computer';
+  } else {
+    console.log('Fail');
+    computerTurn(board);
+    currentPlayer = 'Player';
+  }
+}
+
+function computerTurn(boardObject) {
+  let computerChoice;
+
+  if (getHighRiskSquare(boardObject, COMP_MARK) !== 0) {
+    computerChoice = getHighRiskSquare(boardObject, COMP_MARK);
+  } else if (getHighRiskSquare(boardObject, PLAYER_MARK) !== 0) {
+    computerChoice = getHighRiskSquare(boardObject, PLAYER_MARK);
+  } else if (boardObject[5] === ' ') {
+    computerChoice = 5;
+  } else {
+    computerChoice = remainingSpots[getRandomInt(remainingSpots.length)];
+  }
+
+  updateRemainingSpotsBoard(computerChoice);
+  updateBoard(boardObject, computerChoice, COMP_MARK);
+}
+
+function getAlternatePlayers() {
+  spacerSmall();
+  displayAlternateMessage();
+  let input = readSync.question();
+  while (!isValidYN(input)) {
+    displayInvalidYN();
+    input = readSync.question();
+  }
+
+  console.clear();
+  if (input === 'y' || input === 'Y') {
+    alternate = 'on';
+  } else if (input === 'n' || input === 'N') {
+    alternate = 'off';
+  }
+}
+
+function getHighRiskSquare(board, mark) {
+  let keys =  Object.keys(HIGHRISKSQUARES);
+  let highRisk = 0;
+
+  keys.forEach(key => {
+    HIGHRISKSQUARES[key].forEach(pair => {
+      if (
+        board[pair[0]] === mark &&
+        board[pair[1]] === mark &&
+        board[Number(key)] === ' '
+        ) {
+          highRisk = Number(key);
+        }
+    });
+  });
+  return highRisk;
+}
+
+function getWhoGoesFirst() {
+  console.clear();
+  spacerSmall();
+  displayWhoGoesFirstMessage();
+  let input = readSync.question();
+  while (!isValidWhoGoesFirst(input)) {
+    displayInvalidWhoGoesFirst();
+    input = readSync.question();
+  }
+
+  if (input === 'f' || input === 'F') {
+    firstToAct = 'Player';
+    currentPlayer = 'Player';
+  } else if (input === 's' || input === 'S') {
+    firstToAct = 'Computer';
+    currentPlayer = 'Computer';
+  }
+}
+
+function initializeBoard() {
+  let board = {};
+
+  for (let square = 1; square <= 9; square++) {
+    board[String(square)] = INITIAL_MARK;
+  }
+
+  return board;
+}
+
+function initializeScoreBoard() {
+  let scoreBoard = [0, 0, 0];
+
+  return scoreBoard;
+}
+
+function inputValid(userInput) {
+  return (remainingSpots.includes(parseInt(userInput, 10)));
+}
+
+function isGrandWinner(scoreBoard) {
+  return (scoreBoard[0] === GAME_TOTAL || scoreBoard[1] === GAME_TOTAL);
+}
+
+function isValidYN(input) {
+  return (input === 'y' || input === 'Y' || input === 'n' || input === 'N');
+}
+
+function isValidWhoGoesFirst(input) {
+  return (input === 'f' || input === 'F' || input === 's' || input === 'S');
+}
+
+function joinOr(array, seperator, word) {
+  return (array.slice(0, array.length - 1).join(seperator) + " " + word + " " +
+          array.slice(array.length - 1));
+}
+
+function playAgain() {
+  let input = readSync.question();
+  while (!isValidYN(input)) {
+    displayInvalidYN();
+    input = readSync.question();
+  }
+
+  if (input === 'n' || input === 'N') {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function playerGrandWinner(scoreBoard) {
+  return (scoreBoard[0] === GAME_TOTAL);
+}
+
+function playerTurn(boardObject) {
+  displayUserTurn(boardObject);
   let userInput = readSync.question();
 
-  // User input Validation
-  while (!remainingSpots.includes(parseInt(userInput))) {
-    console.log("Invalid Input. Please select one of the available options below:");
-    displayRemainingOptions()
-    displayOptions(boardObject);
+  while (!inputValid(userInput)) {
+    displayInvalidInput(boardObject);
     userInput = readSync.question();
   }
 
-  //deleteing user selection from remaining spoots array
-  let indexToDelete = remainingSpots.indexOf(parseInt(userInput));
+  updateRemainingSpotsBoard(userInput);
+  updateBoard(boardObject, userInput, PLAYER_MARK);
+}
+
+function populateDisplayOptions(value, num) {
+  if (value === INITIAL_MARK) {
+    return num;
+  } else {
+    return ' ';
+  }
+}
+
+function resetGame() {
+  scoreBoard = initializeScoreBoard();
+  setUpGame();
+}
+
+function resetRemainingSpots() {
+  return [1, 2, 3, 4, 5, 6, 7, 8, 9];
+}
+
+function setUpGame() {
+  getWhoGoesFirst();
+  getAlternatePlayers();
+}
+function someoneWon(board) {
+  if (checkWinner(PLAYER_MARK, board)) {
+    winnerFoundGameReset(1, PLAYER_MARK, board);
+    return true;
+  } else if (checkWinner(COMP_MARK, board)) {
+    winnerFoundGameReset(-1, COMP_MARK, board);
+    return true;
+  }
+  return false;
+}
+
+function swapWhoGoesFirst() {
+  if (alternate === 'on' && firstToAct === 'Player') {
+    firstToAct = 'Computer';
+    currentPlayer = 'Computer';
+  } else if (alternate === 'on' && firstToAct === 'Computer') {
+    firstToAct = 'Player';
+    currentPlayer = 'Player';
+  } else if (alternate === 'off' && firstToAct === 'Computer') {
+    currentPlayer = 'Computer';
+  }  else if (alternate === 'off' && firstToAct === 'Player') {
+    currentPlayer = 'Player';
+  }
+}
+
+function updateBoard(board, input, mark) {
+  if (mark === PLAYER_MARK) {
+    board[input] = PLAYER_MARK;
+  } else {
+    board[input] = COMP_MARK;
+  }
+}
+
+function updateRemainingSpotsBoard(input) {
+  indexToDelete = remainingSpots.indexOf(parseInt(input, 10));
   remainingSpots.splice(indexToDelete, 1);
   console.clear();
+}
 
-  //player turn
-  boardObject[userInput] = PLAYER_MARK;
+function updateScore(num, scoreBoard) {
+  if (num === 1) {
+    scoreBoard[0] += 1;
+  } else if (num === -1) {
+    scoreBoard[1] += 1;
+  } else if (num === 0) {
+    scoreBoard[2] += 1;
+  }
+}
 
-  //chbecking if remaingin spots is empty
-  if (remainingSpots.length < 1) {
-    break;
+function updateWhenBoardFull(board) {
+  updateScore(0, scoreBoard);
+  displayScoreBoard(scoreBoard);
+  displayTie(board, scoreBoard);
+  swapWhoGoesFirst();
+}
+
+function winnerFoundGameReset(number, mark, board) {
+  updateScore(number, scoreBoard);
+  displayScoreBoard(scoreBoard);
+  displayWinner(mark, board);
+  swapWhoGoesFirst();
+}
+
+displayWelcomeMessage();
+setUpGame();
+while (true) {
+  let boardObject = initializeBoard();
+
+  while (true) {
+    displayScoreBoard(scoreBoard);
+    chooseSquare(boardObject);
+    if (someoneWon(boardObject)) break;
+
+    if (boardFull()) {
+      updateWhenBoardFull(boardObject);
+      break;
+    }
   }
 
-  //computer turn
-  let computerChoice = remainingSpots[getRandomInt(remainingSpots.length)];
-
-  //deleteing computer selection from remaining spoots array
-  indexToDelete = remainingSpots.indexOf(parseInt(computerChoice));
-  remainingSpots.splice(indexToDelete, 1);
-
-  boardObject[computerChoice] = COMP_MARK;
-  displayBoard(boardObject);
-
-  checkWinner(PLAYER_MARK, boardObject);
-  checkWinner(COMP_MARK, boardObject);
-
-  //chbecking if remaingin spots is empty
-  if (remainingSpots.length < 1) {
-    break;
+  if (isGrandWinner(scoreBoard)) {
+    displayGrandWinner();
+    if (!playAgain()) break;
+    resetGame();
   }
+
+  remainingSpots = resetRemainingSpots();
 }
