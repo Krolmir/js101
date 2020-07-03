@@ -1,15 +1,3 @@
-// Write a function that turns a string of numeerical values into a number
-
-// Input: string of numbers
-// Output: Integer
-
-// Steps
-// split the numbers into an array and then create a loop to ocmpare them one
-// by one
-
-// create a compare case with 1
-//
-
 function stringToInteger(string) {
   let tempArray = string.split('');
   let result = [];
@@ -60,17 +48,27 @@ function stringToInteger(string) {
 
   result.join('');
   let value = 0;
-  console.log(result);
-
-  result.forEach(digit => {
-    console.log(`The Value is ${value}`);
-    console.log(`The Digit is ${digit}`);
-    (value = (10 * value) + digit)
-  });
-  console.log(value);
+  result.forEach(digit => (value = (10 * value) + digit));
   return value;
 }
 
+// Write a function that turns a signed string into a signed number
+// input: string with a sign or maybe not
+// output: number with sign or not
 
-console.log(stringToInteger("4321") === 4321); // logs true
-console.log(stringToInteger("570") === 570); // logs true
+// check to see what character is at the first place.
+
+function stringToSignedInteger(string) {
+  let sign = string.charAt(0);
+  if (sign === '-') {
+    return -(stringToInteger(string.substring(1)));
+  } else if (sign === '+') {
+    return (stringToInteger(string.substring(1)));
+  } else {
+    return stringToInteger(string);
+  }
+}
+
+console.log(stringToSignedInteger("4321") === 4321); // logs true
+console.log(stringToSignedInteger("-570") === -570); // logs true
+console.log(stringToSignedInteger("+100") === 100); // logs true
