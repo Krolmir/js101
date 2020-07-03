@@ -81,18 +81,12 @@ function displayGrandWinnerComputer() {
   spacerLarge();
   console.log("Sorry but the computer has bested you in the race to " +
               GAME_TOTAL + " wins. They are the Grand Winner.");
-  spacerLarge();
-  displayPlayAgain();
-  spacerLarge();
 }
 
 function displayGrandWinnerPlayer() {
   spacerLarge();
   console.log("Cogragualtions you are the Grand Winner in the race to " +
-               GAME_TOTAL + " wins!!!");
-  spacerLarge();
-  displayPlayAgain();
-  spacerLarge();
+              GAME_TOTAL + " wins!!!");
 }
 
 function displayInvalidInput(boardObject) {
@@ -115,7 +109,6 @@ function displayInvalidYN() {
 }
 
 function displayOptions(board) {
-  emptyLine();
   console.log('                  |   |   ');
   console.log('                ' +
               populateDisplayOptions(board[1], 1) + ' | ' +
@@ -137,8 +130,10 @@ function displayOptions(board) {
 }
 
 function displayPlayAgain() {
+  spacerLarge();
   prompt("Would you like to play again?");
   displayYesNoPrompt();
+ spacerLarge();
 }
 
 function displayRules() {
@@ -179,15 +174,13 @@ function displayTie(boardObject) {
 }
 
 function displayWinner(user, boardObject) {
+  displayBoard(boardObject);
   if (user === PLAYER_MARK) {
-    displayBoard(boardObject);
     console.log('You have Won!');
-    displayEnterToContinue();
   } else if (user === COMP_MARK) {
-    displayBoard(boardObject);
     console.log('The Computer has won!');
-    displayEnterToContinue();
   }
+  displayEnterToContinue();
 }
 
 function displayWelcomeMessage() {
@@ -240,7 +233,6 @@ function chooseSquare(board) {
     playerTurn(board);
     currentPlayer = 'Computer';
   } else {
-    console.log('Fail');
     computerTurn(board);
     currentPlayer = 'Player';
   }
@@ -248,7 +240,6 @@ function chooseSquare(board) {
 
 function computerTurn(boardObject) {
   let computerChoice;
-
   if (getHighRiskSquare(boardObject, COMP_MARK) !== 0) {
     computerChoice = getHighRiskSquare(boardObject, COMP_MARK);
   } else if (getHighRiskSquare(boardObject, PLAYER_MARK) !== 0) {
@@ -334,7 +325,8 @@ function initializeScoreBoard() {
 }
 
 function inputValid(userInput) {
-  return (remainingSpots.includes(parseInt(userInput, 10)));
+  return ((remainingSpots.includes(parseFloat(userInput, 10))) &&
+          (userInput.length < 2));
 }
 
 function isGrandWinner(scoreBoard) {
@@ -406,15 +398,9 @@ function setUpGame() {
   getWhoGoesFirst();
   getAlternatePlayers();
 }
+
 function someoneWon(board) {
-  if (checkWinner(PLAYER_MARK, board)) {
-    winnerFoundGameReset(1, PLAYER_MARK, board);
-    return true;
-  } else if (checkWinner(COMP_MARK, board)) {
-    winnerFoundGameReset(-1, COMP_MARK, board);
-    return true;
-  }
-  return false;
+  return ((checkWinner(PLAYER_MARK, board)) || (checkWinner(COMP_MARK, board)));
 }
 
 function swapWhoGoesFirst() {
@@ -462,7 +448,13 @@ function updateWhenBoardFull(board) {
   swapWhoGoesFirst();
 }
 
-function winnerFoundGameReset(number, mark, board) {
+function winnerFoundGameReset(board) {
+  checkWinner(PLAYER_MARK, board) ?
+  updateScoreWinnerFound(1, PLAYER_MARK, board) :
+  updateScoreWinnerFound(-1, COMP_MARK, board);
+}
+
+function updateScoreWinnerFound(number, mark, board) {
   updateScore(number, scoreBoard);
   displayScoreBoard(scoreBoard);
   displayWinner(mark, board);
@@ -477,7 +469,10 @@ while (true) {
   while (true) {
     displayScoreBoard(scoreBoard);
     chooseSquare(boardObject);
-    if (someoneWon(boardObject)) break;
+    if (someoneWon(boardObject)) {
+      winnerFoundGameReset(boardObject);
+      break;
+    }
 
     if (boardFull()) {
       updateWhenBoardFull(boardObject);
@@ -487,6 +482,7 @@ while (true) {
 
   if (isGrandWinner(scoreBoard)) {
     displayGrandWinner();
+    displayPlayAgain();
     if (!playAgain()) break;
     resetGame();
   }
