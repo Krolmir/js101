@@ -1,25 +1,5 @@
-// Greet and welcome the Player
-
-// 1. Initialize deck
-//  Shuffle Deck
-
-// 2. Deal cards to player and dealer
-// iniatlize 2 arrays: Player cards. Dealer cards.
-// Pop the first card give it to the player, pop second card to dealer
-//
-
-// 3. Player turn: hit or stay
-//   - repeat until bust or stay
-// 4. If player bust, dealer wins.
-// 5. Dealer turn: hit or stay
-//   - repeat until total >= 17
-// 6. If dealer busts, player wins.
-// 7. Compare cards and declare winner.
-
-// Create a deck of cards
-
 const readLineSync = require('readline-sync');
-const CARDNUMBERS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A', 'A', 'A', 'A'];
+const CARDNUMBERS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 const SUITS = ['♠', '♥', '♦', '♣'];
 let playerCards = [];
 let dealerCards = [];
@@ -32,6 +12,59 @@ function prompt(msg = "") {
 
 function emptyLine() {
   console.log(' ');
+}
+
+function spacerSmall() {
+  console.log("----------------------------");
+}
+
+function spacerMedium() {
+  console.log("----------------------------------------------------");
+}
+
+function spacerLarge() {
+  console.log("--------------------------------------------------------------");
+}
+
+function displayBust(player) {
+  emptyLine();
+  spacerMedium();
+  if (player === 'player') console.log('You have busted. Dealer Wins.');
+  if (player === 'dealer') console.log('Dealer has busted. You Win!');
+  spacerMedium();
+  emptyLine();
+}
+
+function displayCardsOnTable(cards) {
+  let string = '';
+
+  cards.forEach(card => {
+    string += `|${card.join('')}|`;
+  });
+  return string;
+}
+
+function displayDealerWins() {
+  spacerSmall();
+  prompt('Dealer Wins.');
+  spacerSmall();
+}
+
+function displayHitOrStayPrompt() {
+  emptyLine();
+  prompt('Would you like to Hit or Stay?');
+  prompt("Please enter 'h' or 'H' for hit and 's' or 'S' for stay:");
+}
+function displayInvalidHitOrStayPrompt() {
+  emptyLine();
+  console.log('That is not a valid option.');
+  prompt("Please enter 'H' or 'h' for hit and 'S' or 's' for stay:");
+}
+
+function displayPlayerWins() {
+  spacerMedium();
+  prompt('You Win!');
+  spacerMedium();
 }
 
 function displayTableIntro() {
@@ -47,27 +80,52 @@ function displayTableIntro() {
   console.log('|__________________________________|');
 }
 
-function displayTable() {
+function displayTable(hidden = false) {
+  console.clear();
   console.log('____________________________________');
   console.log('|                                  ');
-  console.log('|Dealer Total:                     ');
-  console.log(`|    |${dealerCards[0].join('')}| |${dealerCards[1].join('')}|`);
+  if (hidden) {
+    console.log(`|Dealer Total: ${oneCardTotal(dealerCards)}`);
+    console.log(`|    |${dealerCards[0].join('')}|`);
+  } else {
+    console.log(`|Dealer Total: ${dealerTotal}`);
+    console.log(`|    ${displayCardsOnTable(dealerCards)}`);
+  }
   console.log('|                                  ');
   console.log('|                                  ');
   console.log('|                                  ');
-  console.log(`|Player Total: ${playerTotal}  `);
+  console.log(`|Player Total: ${playerTotal}`);
   console.log(`|    ${displayCardsOnTable(playerCards)}`);
   console.log('|                                  ');
   console.log('|__________________________________');
 }
 
-function displayCardsOnTable(cards) {
-  let string = '';
+function displayTie() {
+  spacerSmall();
+  prompt('It\'s a Tie.');
+  spacerSmall();
+}
 
-  cards.forEach(card => {
-    string += `|${card.join('')}|`;
-  });
-  return string;
+function displayTotals() {
+  emptyLine();
+  prompt(`Dealer has ${dealerTotal}`);
+  prompt(`You have ${playerTotal}.`);
+}
+
+function displayWinner(winner) {
+  displayTotals();
+  if (winner === 'player') {
+    displayPlayerWins();
+  } else if (winner === 'dealer') {
+    displayDealerWins();
+  } else {
+    displayTie();
+  }
+}
+
+function calculateInitialTotals() {
+  playerTotal = calculateTotal(playerCards);
+  dealerTotal = calculateTotal(dealerCards);
 }
 
 function calculateTotal(cards) {
@@ -93,6 +151,41 @@ function calculateTotal(cards) {
   return total;
 }
 
+function checkBust(total) {
+  return (total > 21);
+}
+
+function dealACard(cards, deck) {
+  cards.push(deck.pop());
+}
+
+function dealerTurn() {
+  displayTable();
+  emptyLine();
+  readLineSync.question('Dealer will hit. Press enter to see their next card.');
+  dealACard(dealerCards, freshDeck);
+  dealerTotal = calculateTotal(dealerCards);
+  displayTable();
+}
+
+function findWinner(player, dealer) {
+  if (player > dealer) {
+    return 'player';
+  } else if (dealer > player) {
+    return 'dealer';
+  } else {
+    return 'tie';
+  }
+}
+
+function gameSetUp() {
+  displayTableIntro();
+  readLineSync.question();
+  freshDeck = initializeDeck();
+  shuffleCards(freshDeck);
+  initialCardsDealt(freshDeck);
+}
+
 function initializeDeck() {
   let deck = [];
 
@@ -111,50 +204,75 @@ function initialCardsDealt() {
   }
 }
 
-function dealACard(cards, deck) {
-  cards.push(deck.pop());
-}
-
-function shuffleCards(deck) {
-  for (let index = deck.length - 1; index > 0; index--) {
-    let otherIndex = Math.floor(Math.random() * (index + 1)); // 0 to index
-    [deck[index], deck[otherIndex]] = [deck[otherIndex], deck[index]]; // swap elements
-  }
-}
-
-displayTableIntro();
-readLineSync.question();
-console.clear();
-
-freshDeck = initializeDeck();
-shuffleCards(freshDeck);
-initialCardsDealt(freshDeck);
-playerTotal = calculateTotal(playerCards);
-displayTable();
-
-while (true) {
-  displayHitOrStayPrompt();
-  let input = readLineSync.question();
-  while (!isValid(input)) {
-    console.log('That is not a valid option.');
-    prompt("Please enter 'H' or 'h' for hit and 'S' or 's' for stay:");
-  input = readLineSync.question();
-  }
-
-  if ((input === 's') || (input === 'S')) break;
-
-  dealACard(playerCards, freshDeck);
-  playerTotal = calculateTotal(playerCards);
-  displayTable();
-}
-
 function isValid(input) {
   return ((input === 's') || (input === 'S') ||
           (input === 'h') || (input === 'H'));
 }
 
-function displayHitOrStayPrompt() {
-  emptyLine();
-  prompt('Would you like to Hit or Stay?');
-  prompt("Please enter 'h' or 'H' for hit and 's' or 'S' for stay:");
+function oneCardTotal(card) {
+  switch(card[0][0]) {
+    case 'A':
+      return 11;
+    case 'J':
+      return 10;
+    case 'Q':
+      return 10;
+    case 'K':
+      return 10;
+    default:
+      return Number.parseInt(card[0][0]);
+  }
 }
+
+function playerTurn() {
+  dealACard(playerCards, freshDeck);
+  playerTotal = calculateTotal(playerCards);
+  displayTable(true);
+}
+
+function scoring() {
+  displayTable();
+  if (dealerTotal > 21) {
+    displayBust('dealer');
+  } else if (playerTotal > 21) {
+   displayBust('player');
+  } else {
+    displayWinner(findWinner(playerTotal, dealerTotal));
+  }
+}
+
+function shuffleCards(deck) {
+  for (let index = deck.length - 1; index > 0; index--) {
+    let otherIndex = Math.floor(Math.random() * (index + 1));
+    [deck[index], deck[otherIndex]] = [deck[otherIndex], deck[index]];
+  }
+}
+
+gameSetUp();
+calculateInitialTotals();
+displayTable(true);
+
+while (true) {
+  displayHitOrStayPrompt();
+  let input = readLineSync.question();
+
+  while (!isValid(input)) {
+    displayInvalidHitOrStayPrompt();
+    input = readLineSync.question();
+  }
+
+  if ((input === 's') || (input === 'S')) break;
+
+  playerTurn();
+  if (checkBust(playerTotal)) {
+    displayBust();
+    break;
+  };
+}
+
+while (true && !(checkBust(playerTotal))) {
+  if (dealerTotal > 16) break;
+  dealerTurn();
+}
+
+scoring();
