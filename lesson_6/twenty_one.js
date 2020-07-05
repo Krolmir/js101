@@ -1,6 +1,11 @@
 const readLineSync = require('readline-sync');
-const CARDNUMBERS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+const CARD_NUMBERS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 const SUITS = ['♠', '♥', '♦', '♣'];
+const GAME_TOTAL = 21;
+const WRITTEN_GAME_TOTAL = 'Twenty One';
+const MAX_WINS = 5;
+let playerWinTotal = 0;
+let dealerWinTotal = 0;
 let playerCards = [];
 let dealerCards = [];
 let freshDeck = [];
@@ -20,10 +25,6 @@ function spacerSmall() {
 
 function spacerMedium() {
   console.log("----------------------------------------------------");
-}
-
-function spacerLarge() {
-  console.log("--------------------------------------------------------------");
 }
 
 function displayBust(player) {
@@ -52,6 +53,7 @@ function displayDealerWins() {
 
 function displayHitOrStayPrompt() {
   emptyLine();
+  prompt(`You total is currently ${playerTotal}.`);
   prompt('Would you like to Hit or Stay?');
   prompt("Please enter 'h' or 'H' for hit and 's' or 'S' for stay:");
 }
@@ -59,6 +61,18 @@ function displayInvalidHitOrStayPrompt() {
   emptyLine();
   console.log('That is not a valid option.');
   prompt("Please enter 'H' or 'h' for hit and 'S' or 's' for stay:");
+}
+
+function displayMultipleGameWinner() {
+  displayTable();
+  emptyLine();
+  spacerMedium();
+  if (dealerWinTotal === MAX_WINS) {
+    prompt(`The dealer has beaten you in the race to ${MAX_WINS} wins.`);
+  } else {
+    prompt(`You have won the race to ${MAX_WINS} wins.`);
+  }
+  spacerMedium();
 }
 
 function displayPlayAgain(invalid = false) {
@@ -76,10 +90,19 @@ function displayPlayerWins() {
   spacerMedium();
 }
 
+function displayScoreBoard() {
+  console.clear();
+  console.log('____________________________________');
+  console.log('|                                   |');
+  console.log(`|      Score: Player: ${playerWinTotal}             |`);
+  console.log(`|             Dealer: ${dealerWinTotal}             |`);
+  console.log('|___________________________________|');
+}
+
 function displayTableIntro() {
   console.log('____________________________________');
   console.log('|                                  |');
-  console.log('|      Welcome to Twenty One!      |');
+  console.log(`|      Welcome to ${WRITTEN_GAME_TOTAL}`);
   console.log('|                                  |');
   console.log('|                                  |');
   console.log('|                                  |');
@@ -90,7 +113,7 @@ function displayTableIntro() {
 }
 
 function displayTable(hidden = false) {
-  console.clear();
+  displayScoreBoard();
   console.log('____________________________________');
   console.log('|                                  ');
   if (hidden) {
@@ -101,11 +124,8 @@ function displayTable(hidden = false) {
     console.log(`|    ${displayCardsOnTable(dealerCards)}`);
   }
   console.log('|                                  ');
-  console.log('|                                  ');
-  console.log('|                                  ');
   console.log(`|Player Total: ${playerTotal}`);
   console.log(`|    ${displayCardsOnTable(playerCards)}`);
-  console.log('|                                  ');
   console.log('|__________________________________');
 }
 
@@ -140,7 +160,6 @@ function calculateInitialTotals() {
 function calculateTotal(cards) {
   let total = 0;
   let aceCounter = 0;
-
   cards.forEach(card => {
     if (card[0] === 'A') {
       total += 11;
@@ -148,20 +167,26 @@ function calculateTotal(cards) {
     } else if ((card[0] === 'J' ) || (card[0] === 'Q') || (card[0] === 'K' )) {
       total += 10;
     } else {
-      total += Number.parseInt(card[0]);
+      total += Number.parseInt(card[0], 10);
     }
   });
 
-  while ((total > 21) && (aceCounter > 0)) {
+  while ((total > GAME_TOTAL) && (aceCounter > 0)) {
     total -= 10;
     aceCounter -= 1;
-  };
+  }
 
   return total;
 }
 
+function calculateWinTotals() {
+  let winner = findWinner(playerTotal, dealerTotal);
+  if (winner === 'player') playerWinTotal += 1;
+  if (winner === 'dealer') dealerWinTotal  += 1;
+}
+
 function checkBust(total) {
-  return (total > 21);
+  return (total > GAME_TOTAL);
 }
 
 function dealACard(cards, deck) {
@@ -178,7 +203,11 @@ function dealerTurn() {
 }
 
 function findWinner(player, dealer) {
-  if (player > dealer) {
+  if (checkBust(player)) {
+    return 'dealer';
+  } else if (checkBust(dealer)) {
+    return 'player';
+  } else if (player > dealer) {
     return 'player';
   } else if (dealer > player) {
     return 'dealer';
@@ -202,7 +231,7 @@ function gameSetUp() {
 function initializeDeck() {
   let deck = [];
 
-  CARDNUMBERS.forEach(number => {
+  CARD_NUMBERS.forEach(number => {
     SUITS.forEach(suit => {
       deck.push([number, suit]);
     });
@@ -211,7 +240,7 @@ function initializeDeck() {
 }
 
 function initialCardsDealt() {
-  for (let i = 0; i < 2; i++) {
+  for (let counter = 0; counter < 2; counter++) {
     dealACard(playerCards, freshDeck);
     dealACard(dealerCards, freshDeck);
   }
@@ -226,8 +255,15 @@ function isValidYesOrNo(input) {
   return ['y', 'Y', 'n', 'N'].includes(input);
 }
 
+function nextGame() {
+  spacerMedium();
+  prompt('Hit enter to go to the next game.');
+  spacerMedium();
+  readLineSync.question();
+}
+
 function oneCardTotal(card) {
-  switch(card[0][0]) {
+  switch (card[0][0]) {
     case 'A':
       return 11;
     case 'J':
@@ -237,7 +273,7 @@ function oneCardTotal(card) {
     case 'K':
       return 10;
     default:
-      return Number.parseInt(card[0][0]);
+      return Number.parseInt(card[0][0], 10);
   }
 }
 
@@ -259,21 +295,27 @@ function playAgainPrompt() {
 function playerTurn() {
   dealACard(playerCards, freshDeck);
   playerTotal = calculateTotal(playerCards);
+
   displayTable(true);
 }
 
 function resetGame() {
   playerCards = [];
-  dealerCards = []
+  dealerCards = [];
   playerTotal = 0;
   dealerTotal = 0;
 }
 
+function resetGameFull() {
+  playerWinTotal = 0;
+  dealerWinTotal = 0;
+}
+
 function scoring() {
-  if (dealerTotal > 21) {
+  if (dealerTotal > GAME_TOTAL) {
     displayTable();
     displayBust('dealer');
-  } else if (playerTotal > 21) {
+  } else if (playerTotal > GAME_TOTAL) {
     displayTable(true);
     displayBust('player');
   } else {
@@ -294,6 +336,7 @@ gameIntro();
 while (true) {
   gameSetUp();
   calculateInitialTotals();
+
   displayTable(true);
 
   while (true) {
@@ -311,17 +354,22 @@ while (true) {
     if (checkBust(playerTotal)) {
       displayBust();
       break;
-    };
+    }
   }
 
   while (true && !(checkBust(playerTotal))) {
-    if (dealerTotal > 16) break;
+    if (dealerTotal > GAME_TOTAL - 5) break;
     dealerTurn();
   }
 
   scoring();
-  let playAgainInput = playAgainPrompt();
-  if (!playAgain(playAgainInput)) break;
-
+  calculateWinTotals();
+  if ((playerWinTotal === MAX_WINS) || (dealerWinTotal === MAX_WINS)) {
+    displayMultipleGameWinner();
+    let playAgainInput = playAgainPrompt();
+    if (!playAgain(playAgainInput)) break;
+    resetGameFull();
+  }
+  nextGame();
   resetGame();
 }
