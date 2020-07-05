@@ -61,6 +61,15 @@ function displayInvalidHitOrStayPrompt() {
   prompt("Please enter 'H' or 'h' for hit and 'S' or 's' for stay:");
 }
 
+function displayPlayAgain(invalid = false) {
+  spacerMedium();
+  if (invalid === false) prompt('Would you like to play again?');
+  if (invalid === true) prompt('That is not a valid input.');
+  prompt('Please enter \'Y\' or \'y\' for yes and \'N\' or \'n\' for no:');
+  spacerMedium();
+  emptyLine();
+}
+
 function displayPlayerWins() {
   spacerMedium();
   prompt('You Win!');
@@ -108,7 +117,7 @@ function displayTie() {
 
 function displayTotals() {
   emptyLine();
-  prompt(`Dealer has ${dealerTotal}`);
+  prompt(`Dealer has ${dealerTotal}.`);
   prompt(`You have ${playerTotal}.`);
 }
 
@@ -178,9 +187,13 @@ function findWinner(player, dealer) {
   }
 }
 
-function gameSetUp() {
+function gameIntro() {
+  console.clear();
   displayTableIntro();
   readLineSync.question();
+}
+
+function gameSetUp() {
   freshDeck = initializeDeck();
   shuffleCards(freshDeck);
   initialCardsDealt(freshDeck);
@@ -209,6 +222,10 @@ function isValid(input) {
           (input === 'h') || (input === 'H'));
 }
 
+function isValidYesOrNo(input) {
+  return ['y', 'Y', 'n', 'N'].includes(input);
+}
+
 function oneCardTotal(card) {
   switch(card[0][0]) {
     case 'A':
@@ -224,19 +241,43 @@ function oneCardTotal(card) {
   }
 }
 
+function playAgain(input) {
+  return ['y', 'Y'].includes(input);
+}
+
+function playAgainPrompt() {
+  displayPlayAgain();
+  let input = readLineSync.question();
+
+  while (!isValidYesOrNo(input)) {
+    displayPlayAgain(true);
+    input = readLineSync.question();
+  }
+  return input;
+}
+
 function playerTurn() {
   dealACard(playerCards, freshDeck);
   playerTotal = calculateTotal(playerCards);
   displayTable(true);
 }
 
+function resetGame() {
+  playerCards = [];
+  dealerCards = []
+  playerTotal = 0;
+  dealerTotal = 0;
+}
+
 function scoring() {
-  displayTable();
   if (dealerTotal > 21) {
+    displayTable();
     displayBust('dealer');
   } else if (playerTotal > 21) {
-   displayBust('player');
+    displayTable(true);
+    displayBust('player');
   } else {
+    displayTable();
     displayWinner(findWinner(playerTotal, dealerTotal));
   }
 }
@@ -248,31 +289,39 @@ function shuffleCards(deck) {
   }
 }
 
-gameSetUp();
-calculateInitialTotals();
-displayTable(true);
+gameIntro();
 
 while (true) {
-  displayHitOrStayPrompt();
-  let input = readLineSync.question();
+  gameSetUp();
+  calculateInitialTotals();
+  displayTable(true);
 
-  while (!isValid(input)) {
-    displayInvalidHitOrStayPrompt();
-    input = readLineSync.question();
+  while (true) {
+    displayHitOrStayPrompt();
+    let input = readLineSync.question();
+
+    while (!isValid(input)) {
+      displayInvalidHitOrStayPrompt();
+      input = readLineSync.question();
+    }
+
+    if ((input === 's') || (input === 'S')) break;
+
+    playerTurn();
+    if (checkBust(playerTotal)) {
+      displayBust();
+      break;
+    };
   }
 
-  if ((input === 's') || (input === 'S')) break;
+  while (true && !(checkBust(playerTotal))) {
+    if (dealerTotal > 16) break;
+    dealerTurn();
+  }
 
-  playerTurn();
-  if (checkBust(playerTotal)) {
-    displayBust();
-    break;
-  };
+  scoring();
+  let playAgainInput = playAgainPrompt();
+  if (!playAgain(playAgainInput)) break;
+
+  resetGame();
 }
-
-while (true && !(checkBust(playerTotal))) {
-  if (dealerTotal > 16) break;
-  dealerTurn();
-}
-
-scoring();
