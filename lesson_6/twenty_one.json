@@ -1,0 +1,19 @@
+{
+  "intro": "Best of Luck!!!!",
+  "playerHasMax": "Nice you have 21! Press enter to see what the dealer does.",
+  "youWin": "You Win!",
+  "dealerWin": "Dealer Wins.",
+  "yesOrNoPrompt": "Please enter 'Y' or 'y' for yes and 'N' or 'n' for no:",
+  "notValid": "That is not a valid option.",
+  "playAgain": "Would you like to play again?",
+  "hitOrStayPrompt": "Please enter 'H' or 'h' for hit and 'S' or 's' for stay:",
+  "hitOrStay": "Would you like to Hit or Stay?",
+  "youBust": "You have busted. Dealer Wins.",
+  "dealerBust": "Dealer has busted. You Win!",
+  "spacerMedium": "----------------------------------------------------",
+  "spacerSmall": "----------------------------",
+  "startGamePrompt": "To start the game press enter:",
+  "tie": "It's a Tie.",
+  "dealerHit": "Dealer will hit. Press enter to see their next card.",
+  "nextGame": "Hit enter to go to the next game."
+}
