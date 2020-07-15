@@ -35,7 +35,14 @@ function timeOfDay(num) {
     totalMinutes = num % MINUTES_IN_DAY;
     minutes = totalMinutes % MINUTES_IN_HOUR;
     hours = (totalMinutes - minutes) / MINUTES_IN_HOUR;
-  };
+  } else {
+    num = Math.abs(num);
+    totalMinutes = num % MINUTES_IN_DAY;
+    minutes = totalMinutes % MINUTES_IN_HOUR;
+    hours = (totalMinutes - minutes) / MINUTES_IN_HOUR;
+    minutes = 60 - minutes;
+    hours = 23 - hours;
+  }
 
   hours = addZeros(hours);
   minutes = addZeros(minutes);

@@ -24,7 +24,6 @@ function swap(string) {
     }
   }
   console.log(resultArray.join(' '));
-
 }
 
 swap('Oh what a wonderful day it is');  // "hO thaw a londerfuw yad ti si"
