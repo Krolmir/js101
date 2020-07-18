@@ -14,14 +14,6 @@
 // return new number
 
 function sum(number) {
-  // let array = String(number).split('');
-
-  // let total = array.reduce((a, b) => {
-  //   return (Number(a) + Number(b));
-  // });
-
-  // return total;
-
   return String(number).split('').reduce((a, b) => Number(a) + Number(b))
 }
 
